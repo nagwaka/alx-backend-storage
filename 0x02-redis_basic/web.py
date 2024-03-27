@@ -8,10 +8,10 @@ from functools import wraps
 from typing import Callable
 
 
-redis = redis.Redis()
+redis_instance = redis.Redis()
 
 
-def catch_page(method: Callable) -> Callable:
+def cache_page(method: Callable) -> Callable:
     """
     Cache the result of a function
     """
@@ -20,13 +20,13 @@ def catch_page(method: Callable) -> Callable:
         """
         Check if the content is cached
         """
-        redis.incr(f'count:{url}')
-        result = redis.get(f'result:{url}')
+        redis_instance.incr(f'count:{url}')
+        result = redis_instance.get(f'result:{url}')
         if result:
             return result.decode('utf-8')
         result = method(url)
-        redis.set(f'count:{url}', 0)
-        redis.setex(f'result:{url}', 10, result)
+        redis_instance.set(f'count:{url}', 0)
+        redis_instance.setex(f'result:{url}', 10, result)
         return result
     return wrapper
 
@@ -34,6 +34,6 @@ def catch_page(method: Callable) -> Callable:
 @cache_page
 def get_page(url: str) -> str:
     """
-    Obtains the HTML content of a particular URL.
+    Obtains the HTML content of a particular URL
     """
     return requests.get(url).text
