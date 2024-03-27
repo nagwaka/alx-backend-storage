@@ -11,7 +11,7 @@ class Cache:
     """
     cache class for storing data into Redis db
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self._redis = redis.Redis()
         self._redis.flushdb(True)
 
@@ -37,12 +37,14 @@ class Cache:
 
     def get_str(sel, key: str) -> Union[str, None]:
         """
-        automatically parametrize Cache.get with the correct conversion function.
+        automatically parametrize Cache.get with the correc
+        conversion function.
         """
         return self.get(key, fn=lambda d: d.decode("utf-8"))
 
     def get_int(self, key: str) -> Union[int, None]:
         """
-        automatically parametrize Cache.get with the correct conversion function.
+        automatically parametrize Cache.get with the correct
+        conversion function.
         """
         return self.get(key, fn=int)
