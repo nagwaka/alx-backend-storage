@@ -12,8 +12,8 @@ class Cache:
     cache class for storing data into Redis db
     """
     def __init__(self) -> None:
-        self._redis = redis.Redis()
-        self._redis.flushdb(True)
+        self.__redis = redis.Redis()
+        self.__redis.flushdb(True)
 
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
