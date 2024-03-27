@@ -3,44 +3,38 @@
 A module that uses the requests module to obtain the HTML content
 of a particular URL and returns it
 """
-import requests
 import redis
-import time
+import requests
+from functools import wraps
 from typing import Callable
 
-# Redis connection
+
 redis = redis.Redis()
 
 
-def cache_page(expiration_time: int) -> Callable:
+def catch_page(method: Callable) -> Callable:
     """
-    Decorator to cache the result of a function with
-    a specified expiration time.
+    Cache the result of a function
     """
-    def decorator(func: Callable) -> Callable:
-        def wrapper(url: str) -> str:
-            # Check if the content is cached
-            cached_content = redis.get(f"page:{url}")
-            if cached_content:
-                print("Content retrieved from cache")
-                return cached_content.decode('utf-8')
-
-            # If not cached, fetch content from URL
-            content = func(url)
-
-            # Cache the content with expiration time
-            redis.setex(f"page:{url}", expiration_time, content)
-            print("Content cached")
-
-            return content
-        return wrapper
-    return decorator
+    @wraps(method)
+    def wrapper(url) -> str:
+        """
+        Check if the content is cached
+        """
+        redis.incr(f'count:{url}')
+        result = redis.get(f'result:{url}')
+        if result:
+            return result.decode('utf-8')
+        result = method(url)
+        redis.set(f'count:{url}', 0)
+        redis.setex(f'result:{url}', 10, result)
+        return result
+    return wrapper
 
 
-@cache_page(expiration_time=10)
+@cache_page
 def get_page(url: str) -> str:
     """
     Obtains the HTML content of a particular URL.
     """
-    response = requests.get(url)
-    return response.text
+    return requests.get(url).text
