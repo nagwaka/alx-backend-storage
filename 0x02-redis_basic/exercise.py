@@ -28,7 +28,7 @@ class Cache:
         """
         take a key string argument and an optional Callable argument named fn
         """
-        data = self.__redis.get(key)
+        data = self._redis.get(key)
         if data is None:
             return None
         if fn is not None:
