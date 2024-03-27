@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-A module that uses the requests module to obtain the HTML content
-of a particular URL and returns it
+Implements an expiring web cache and tracker
 """
 import redis
 import requests
