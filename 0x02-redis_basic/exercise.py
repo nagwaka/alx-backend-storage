@@ -8,6 +8,9 @@ from typing import Union, Callable
 
 
 class Cache:
+    """
+    cache class for storing data into Redis db
+    """
     def __init__(self):
         self.__redis = redis.Redis()
         self.__redis.flushdb()
